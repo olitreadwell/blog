@@ -36,6 +36,8 @@ Success means:
 - Multi-author support, accounts, or anything with a login.
 - Migrating old content. There is none to migrate.
 - Newsletter delivery.
+- Generated filler. The tools help with drafting and publishing, but the
+  published entries are mine. No sample posts, no placeholder content.
 
 ## Decisions taken (correct these now, not later)
 

@@ -13,6 +13,9 @@ test("the skip link moves focus to the main landmark", async ({ page }) => {
 
 test("the keyboard reaches the first entry link", async ({ page }) => {
   await page.goto("");
+  const entryLinkCount = await page.locator(".entry h3 a").count();
+  test.skip(entryLinkCount === 0, "no entries published yet");
+
   const firstEntryLink = page.locator(".entry h3 a").first();
   await firstEntryLink.focus();
 
@@ -29,11 +32,24 @@ test("every entry link on the index resolves", async ({ page, request }) => {
     .locator(".entry h3 a")
     .evaluateAll((links) => links.map((link) => link.getAttribute("href") ?? ""));
 
-  expect(hrefs.length).toBeGreaterThan(0);
+  // The site publishes from an empty content directory, so no entries is a
+  // valid state rather than a failure.
+  test.skip(hrefs.length === 0, "no entries published yet");
 
   for (const href of hrefs) {
     const response = await request.get(href);
     expect(response.status(), `${href} should resolve`).toBe(200);
+  }
+});
+
+test("the index explains itself while the blog is empty", async ({ page }) => {
+  await page.goto("");
+  const entryCount = await page.locator(".entry").count();
+
+  if (entryCount === 0) {
+    await expect(page.getByText("Nothing published yet.")).toBeVisible();
+  } else {
+    await expect(page.locator(".entry").first()).toBeVisible();
   }
 });
 
@@ -46,7 +62,7 @@ test("the machine-readable endpoints answer", async ({ request }) => {
   expect(feedResponse.status()).toBe(200);
   const feed = await feedResponse.json();
   expect(feed.version).toBe("https://jsonfeed.org/version/1.1");
-  expect(feed.items.length).toBeGreaterThan(0);
+  expect(Array.isArray(feed.items)).toBe(true);
 
   const archiveResponse = await request.get("posts.json");
   expect(archiveResponse.status()).toBe(200);
@@ -58,10 +74,6 @@ test("the machine-readable endpoints answer", async ({ request }) => {
 
   const corpusResponse = await request.get("all.md");
   expect(corpusResponse.status()).toBe(200);
-
-  const twinResponse = await request.get("posts/a-blog-i-own.md");
-  expect(twinResponse.status()).toBe(200);
-  expect(await twinResponse.text()).toContain('"slug": "a-blog-i-own"');
 });
 
 test("the sitemap lists the home page", async ({ request }) => {

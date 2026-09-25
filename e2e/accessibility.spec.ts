@@ -18,8 +18,10 @@ for (const pagePath of pagePaths) {
 
 test("no accessibility violations on an entry page", async ({ page }) => {
   await page.goto("");
-  const firstEntry = page.locator(".entry h3 a").first();
-  await firstEntry.click();
+  const entryLinkCount = await page.locator(".entry h3 a").count();
+  test.skip(entryLinkCount === 0, "no entries published yet");
+
+  await page.locator(".entry h3 a").first().click();
 
   const results = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])

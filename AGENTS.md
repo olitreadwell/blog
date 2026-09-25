@@ -20,6 +20,9 @@ The live site is https://olitreadwell.github.io/blog/, deployed from `main` by
 
 - `content/<kind>/` holds markdown. The four kinds are `posts`, `notes`,
   `links`, `photos`. Never write entries anywhere else.
+- The content directory is empty on purpose. Do not add sample or placeholder
+  entries, and do not fill the blog with generated posts. Drafting help is
+  welcome, publishing is a human decision.
 - `src/lib/` holds logic worth testing: schemas, slug rules, date formatting,
   the merged entry stream. Keep pure functions here.
 - `src/pages/` holds routes. `[kind]/[slug].astro` serves every entry, so the

@@ -127,3 +127,16 @@ describe("countWords", () => {
     expect(countWords("")).toBe(0);
   });
 });
+
+describe("an empty corpus", () => {
+  it("still produces a valid feed and index", () => {
+    expect(renderJsonFeed([], site).items).toEqual([]);
+    expect(renderArchiveIndex([], site).count).toBe(0);
+    expect(buildRssItems([])).toEqual([]);
+  });
+
+  it("still produces a usable corpus file and llms.txt", () => {
+    expect(renderAllMarkdown([], site)).toContain("Entries: 0");
+    expect(renderLlmsTxt([], site).startsWith("# Oli Treadwell")).toBe(true);
+  });
+});

@@ -21,7 +21,7 @@ const heading = kind.charAt(0).toUpperCase() + kind.slice(1);
 <BaseLayout title={heading} description={`Every ${kind} entry, newest first.`}>
   <h1>{heading}</h1>
   {entries.length === 0 ? (
-    <p>Nothing here yet.</p>
+    <p>Nothing here yet. Write one in {`content/${kind}/`} and it shows up.</p>
   ) : (
     <ul class="entry-list">
       {entries.map((entry) => (

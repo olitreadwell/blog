@@ -7,6 +7,9 @@ Astro builds a static site from markdown in `content/`. There is no database
 and no server. An MCP server (later milestone) reads and writes the same
 markdown, so an agent session can draft, edit and publish without a CMS.
 
+The content directory starts empty on purpose. Entries here are written by me.
+Agent help with drafting is fine, the words are still mine.
+
 Live site: <https://olitreadwell.github.io/blog/>
 
 ## Quickstart

@@ -8,10 +8,16 @@ const entries = await loadPublishedStream();
 
 <BaseLayout description="Everything published here, newest first.">
   <h1>Everything</h1>
-  <p>Posts, notes, links and photos, newest first.</p>
-  <ul class="entry-list">
-    {entries.map((entry) => (
-      <EntryCard entry={entry} />
-    ))}
-  </ul>
+  {entries.length === 0 ? (
+    <p>Nothing published yet. Posts, notes, links and photos land here.</p>
+  ) : (
+    <>
+      <p>Posts, notes, links and photos, newest first.</p>
+      <ul class="entry-list">
+        {entries.map((entry) => (
+          <EntryCard entry={entry} />
+        ))}
+      </ul>
+    </>
+  )}
 </BaseLayout>
