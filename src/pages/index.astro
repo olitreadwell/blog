@@ -1,0 +1,17 @@
+---
+import EntryCard from "../components/EntryCard.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { loadPublishedStream } from "../lib/postStream";
+
+const entries = await loadPublishedStream();
+---
+
+<BaseLayout description="Everything published here, newest first.">
+  <h1>Everything</h1>
+  <p>Posts, notes, links and photos, newest first.</p>
+  <ul class="entry-list">
+    {entries.map((entry) => (
+      <EntryCard entry={entry} />
+    ))}
+  </ul>
+</BaseLayout>

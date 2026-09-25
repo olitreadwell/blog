@@ -1,0 +1,53 @@
+---
+import { render } from "astro:content";
+
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { formatEntryDate, formatEntryDateMachine } from "../../lib/formatEntryDate";
+import { loadPublishedStream } from "../../lib/postStream";
+
+// One route serves every kind: /posts/slug/, /notes/slug/, /links/slug/ and
+// /photos/slug/. The collection name and the slug come from the entry itself.
+export async function getStaticPaths() {
+  const entries = await loadPublishedStream();
+
+  return entries.map((entry) => ({
+    params: { kind: entry.collection, slug: entry.id },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const title = entry.data.title ?? "Note";
+---
+
+<BaseLayout title={title} description={entry.data.summary}>
+  <article>
+    <h1>{title}</h1>
+    <p class="entry-meta">
+      <span class="entry-kind">{entry.collection.slice(0, -1)}</span>
+      <time datetime={formatEntryDateMachine(entry.data.date)}>
+        {formatEntryDate(entry.data.date)}
+      </time>
+    </p>
+    {entry.collection === "links" && (
+      <p>
+        Link: <a href={entry.data.url}>{entry.data.site ?? entry.data.url}</a>
+      </p>
+    )}
+    {entry.collection === "photos" && (
+      <ul>
+        {entry.data.images.map((image) => (
+          <li>
+            <img src={image.src} alt={image.alt} loading="lazy" />
+            {image.caption && <p>{image.caption}</p>}
+          </li>
+        ))}
+      </ul>
+    )}
+    <Content />
+    {entry.data.tags.length > 0 && (
+      <p class="entry-meta">Tags: {entry.data.tags.join(", ")}</p>
+    )}
+  </article>
+</BaseLayout>

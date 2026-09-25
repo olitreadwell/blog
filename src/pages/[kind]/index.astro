@@ -1,0 +1,32 @@
+---
+import EntryCard from "../../components/EntryCard.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import {
+  loadPublishedStream,
+  postCollectionNames,
+  type PostCollectionName,
+} from "../../lib/postStream";
+
+export function getStaticPaths() {
+  return postCollectionNames.map((kind) => ({ params: { kind } }));
+}
+
+const { kind } = Astro.params as { kind: PostCollectionName };
+const entries = (await loadPublishedStream()).filter(
+  (entry) => entry.collection === kind,
+);
+const heading = kind.charAt(0).toUpperCase() + kind.slice(1);
+---
+
+<BaseLayout title={heading} description={`Every ${kind} entry, newest first.`}>
+  <h1>{heading}</h1>
+  {entries.length === 0 ? (
+    <p>Nothing here yet.</p>
+  ) : (
+    <ul class="entry-list">
+      {entries.map((entry) => (
+        <EntryCard entry={entry} />
+      ))}
+    </ul>
+  )}
+</BaseLayout>

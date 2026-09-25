@@ -1,0 +1,40 @@
+---
+import { formatEntryDate, formatEntryDateMachine } from "../lib/formatEntryDate";
+import { buildEntryPath, type PostEntry } from "../lib/postStream";
+
+interface Props {
+  entry: PostEntry;
+}
+
+const { entry } = Astro.props as Props;
+const entryPath = buildEntryPath(entry);
+const kindLabel = entry.collection.slice(0, -1);
+
+// A note often has no title, so the first line of the body stands in for one.
+// Long first lines get cut so the stream stays scannable.
+const noteLine =
+  entry.collection === "notes"
+    ? entry.body?.split("\n").find((line) => line.trim())
+    : undefined;
+const noteLead =
+  noteLine && noteLine.length > 90 ? `${noteLine.slice(0, 87)}...` : noteLine;
+const heading = entry.data.title ?? noteLead ?? "Note";
+---
+
+<li class="entry">
+  <h3>
+    <a href={entryPath}>{heading}</a>
+  </h3>
+  <p class="entry-meta">
+    <span class="entry-kind">{kindLabel}</span>
+    <time datetime={formatEntryDateMachine(entry.data.date)}>
+      {formatEntryDate(entry.data.date)}
+    </time>
+  </p>
+  {entry.collection === "links" && (
+    <p>
+      <a href={entry.data.url}>{entry.data.site ?? entry.data.url}</a>
+    </p>
+  )}
+  {entry.data.summary && <p>{entry.data.summary}</p>}
+</li>
