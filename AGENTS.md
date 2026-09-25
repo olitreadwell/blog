@@ -6,10 +6,15 @@ is the specification, this file is the working convention.
 ## Commands
 
 ```
-npm run check     The gate. Run it before saying a change is done.
-npm run test      Tests only, when iterating.
-npm run dev       Local server at http://localhost:4321/blog/
+npm run check      The gate. Run it before saying a change is done.
+npm run check:full Adds Playwright end-to-end and axe accessibility tests.
+npm run test       Unit tests only, when iterating.
+npm run a11y       Accessibility scans only.
+npm run dev        Local server at http://localhost:4321/blog/
 ```
+
+The live site is https://olitreadwell.github.io/blog/, deployed from `main` by
+`.github/workflows/deploy.yml`.
 
 ## Where things live
 
@@ -20,6 +25,8 @@ npm run dev       Local server at http://localhost:4321/blog/
 - `src/pages/` holds routes. `[kind]/[slug].astro` serves every entry, so the
   URL shape is consistent across kinds.
 - `tests/` mirrors `src/lib/`. A test file is named after its source file.
+- `e2e/` holds Playwright specs. They run against `dist/` served by
+  `scripts/serve-dist.mjs` on the real base path, not against a dev server.
 
 ## Conventions
 

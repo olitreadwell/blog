@@ -7,13 +7,16 @@ Astro builds a static site from markdown in `content/`. There is no database
 and no server. An MCP server (later milestone) reads and writes the same
 markdown, so an agent session can draft, edit and publish without a CMS.
 
+Live site: <https://olitreadwell.github.io/blog/>
+
 ## Quickstart
 
 ```bash
 nvm use            # Node from .nvmrc, currently 24
 npm ci
 npm run dev        # http://localhost:4321/blog/
-npm run check      # format, lint, types, tests, build
+npm run check      # format, lint, types, unit tests, build, smoke check
+npm run check:full # the above plus Playwright end-to-end and axe tests
 ```
 
 ## What an entry is
@@ -46,7 +49,11 @@ npm run typecheck     astro check
 npm run lint          eslint
 npm run format        prettier --write
 npm run test          vitest run
-npm run check         The gate CI runs: format, lint, types, tests, build
+npm run e2e           Playwright end-to-end tests against the built site
+npm run a11y          The axe scans, which are the accessibility subset of e2e
+npm run serve         Serve dist/ in the foreground on port 4321
+npm run check         Format, lint, types, unit tests, build, smoke
+npm run check:full    Everything CI runs, including Playwright and axe
 ```
 
 ## Deploying
@@ -54,6 +61,15 @@ npm run check         The gate CI runs: format, lint, types, tests, build
 Push to `main`. GitHub Actions runs the check and deploys `dist/` to GitHub
 Pages. The site is built with a `/blog` base path, since it is a project site.
 Set `SITE_BASE=/` at build time when it moves to its own domain.
+
+Pages is configured with `build_type: workflow`, so the deploy job is what
+publishes the site. A failing check blocks nothing on its own: check the run
+before merging anything into `main`.
+
+Dependency bumps arrive as Dependabot pull requests. Merge one only after the
+`check` workflow is green on the branch. TypeScript major bumps are ignored for
+now, because `@astrojs/check` and `typescript-eslint` cap their peer range below
+version 7.
 
 Any static host works with the same output: Cloudflare Pages, Netlify, an S3
 bucket or a VPS running Caddy.
@@ -67,6 +83,8 @@ src/pages/     index, per-kind archives, one route for every entry
 src/layouts/   the page shell
 src/styles/    global CSS, light and dark
 tests/         unit tests for the lib layer
+e2e/           Playwright end-to-end and axe accessibility tests
+scripts/       smoke check over dist/ and the foreground static server
 docs/          SPEC.md, the full specification
 tasks/         plan.md and todo.md, the build order
 ```

@@ -25,7 +25,7 @@ Format: task, acceptance, verification, files.
   - Files: `package.json`, `eslint.config.mjs`, `.prettierrc.json`,
     `.github/workflows/check.yml`
 
-- [ ] Task: Add feeds, `posts.json`, markdown twins and `llms.txt`
+- [x] Task: Add feeds, `posts.json`, markdown twins and `llms.txt`
   - Acceptance: `rss.xml` parses, `all.md` holds every entry, `llms.txt` lists
     them
   - Verify: integration test over `dist/`, plus a feed validator
@@ -49,7 +49,7 @@ Format: task, acceptance, verification, files.
   - Verify: `npm run images -- <slug>`, then inspect output metadata
   - Files: `scripts/processPhoto.ts`, `content/media/`
 
-- [ ] Task: Deploy from `main` through GitHub Actions
+- [x] Task: Deploy from `main` through GitHub Actions
   - Acceptance: a push publishes the site with no manual step
   - Verify: push to `main`, then load the live URL
   - Files: `.github/workflows/deploy.yml`
@@ -60,10 +60,17 @@ Format: task, acceptance, verification, files.
   - Verify: unit tests on payload builders, then one prepared cross-post
   - Files: `adapters/`, `content/.syndication.json`
 
-- [ ] Task: Accessibility and Lighthouse pass
+- [x] Task: End-to-end, smoke and accessibility tests
+  - Acceptance: Playwright covers navigation and the machine endpoints, axe
+    reports zero violations, `scripts/smoke-dist.mjs` checks the built output
+  - Verify: `npm run check:full`
+  - Files: `e2e/`, `playwright.config.ts`, `scripts/smoke-dist.mjs`,
+    `scripts/serve-dist.mjs`
+
+- [ ] Task: Lighthouse pass
   - Acceptance: zero axe violations, Lighthouse performance 95 or better
-  - Verify: `npm run a11y`, Lighthouse on a post page
-  - Files: `e2e/`, `src/styles/global.css`
+  - Verify: Lighthouse on a post page against the live URL
+  - Files: `src/styles/global.css`, `src/layouts/BaseLayout.astro`
 
 - [ ] Task: Open source files
   - Acceptance: LICENSE, CONTRIBUTING, SECURITY and a run-your-own README

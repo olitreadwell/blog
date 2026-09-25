@@ -550,3 +550,19 @@ Total: roughly two focused days, or a week of evenings.
 
 Phase 1 ends here. Nothing gets built until the questions above are answered.
 Question 1 decides whether the rest of this document applies at all.
+
+## Decisions resolved, 2026-09-25
+
+- Question 1: Path B, the static pipeline. Free hosting and no server to fall
+  over beat what Ghost offers, so Ghost is out.
+- Generator: Astro.
+- Host: GitHub Pages at `https://olitreadwell.github.io/blog/`, deployed by
+  GitHub Actions from `main`. Cloudflare Pages stays the fallback if a post
+  ever gets real traffic, since its free tier has no bandwidth cap.
+- Content storage: markdown in `content/`, drafts marked `draft: true` in the
+  same directory rather than a separate `content/drafts/` folder.
+- Tests: unit and integration in `tests/`, end-to-end and axe in `e2e/`, plus
+  `scripts/smoke-dist.mjs` over the build output. No Lighthouse run yet.
+- Still open: licence, cross-post destinations, whether Bluesky posts by API,
+  one stream or separate feeds, comments, the landing page link, and whether
+  photos get their own layout.
