@@ -5,12 +5,19 @@ import "../styles/global.css";
 interface Props {
   title?: string;
   description?: string;
+  /** Set when the entry was first published somewhere else. */
+  canonicalUrl?: string;
 }
 
-const { title, description = siteConfig.description } = Astro.props as Props;
+const {
+  title,
+  description = siteConfig.description,
+  canonicalUrl,
+} = Astro.props as Props;
 const pageTitle = title ? `${title} | ${siteConfig.title}` : siteConfig.title;
 
 const siteBase = import.meta.env.BASE_URL.replace(/\/+$/, "");
+const pageUrl = canonicalUrl ?? new URL(Astro.url.pathname, siteConfig.url).toString();
 ---
 
 <!doctype html>
@@ -24,15 +31,12 @@ const siteBase = import.meta.env.BASE_URL.replace(/\/+$/, "");
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)" />
-    <link rel="canonical" href={new URL(Astro.url.pathname, siteConfig.url).toString()} />
+    <link rel="canonical" href={pageUrl} />
     <meta property="og:type" content="website" />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:locale" content={siteConfig.locale} />
-    <meta
-      property="og:url"
-      content={new URL(Astro.url.pathname, siteConfig.url).toString()}
-    />
+    <meta property="og:url" content={pageUrl} />
     <link rel="icon" href={`${siteBase}/favicon.svg`} type="image/svg+xml" />
   </head>
   <body>
