@@ -2,6 +2,7 @@
 title: "End-to-End Testing the Condé Nast Paywalls"
 date: 2018-06-08
 draft: false
+canonical: https://technology.condenast.com/story/end-to-end-testing-conde-nast-paywalls
 ---
 
 # End-to-End Testing the Condé Nast Paywalls

@@ -1,17 +1,24 @@
 ---
 import { render } from "astro:content";
 
-import BaseLayout from "../../layouts/BaseLayout.astro";
-import { formatEntryDate, formatEntryDateMachine } from "../../lib/formatEntryDate";
-import { loadPublishedStream } from "../../lib/postStream";
+import BaseLayout from "../../../../../layouts/BaseLayout.astro";
+import {
+  formatEntryDate,
+  formatEntryDateMachine,
+} from "../../../../../lib/formatEntryDate";
+import {
+  buildEntryRouteParams,
+  loadPublishedStream,
+} from "../../../../../lib/postStream";
 
-// One route serves every kind: /posts/slug/, /notes/slug/, /links/slug/ and
-// /photos/slug/. The collection name and the slug come from the entry itself.
+// One route serves every kind, with the date in the path:
+// /posts/2018/06/08/conde-nast-paywall-e2e/, /notes/2026/09/26/whatever/.
+// The kind, the date and the slug all come from the entry itself.
 export async function getStaticPaths() {
   const entries = await loadPublishedStream();
 
   return entries.map((entry) => ({
-    params: { kind: entry.collection, slug: entry.id },
+    params: buildEntryRouteParams(entry),
     props: { entry },
   }));
 }
@@ -21,7 +28,11 @@ const { Content } = await render(entry);
 const title = entry.data.title ?? "Note";
 ---
 
-<BaseLayout title={title} description={entry.data.summary}>
+<BaseLayout
+  title={title}
+  description={entry.data.summary}
+  canonicalUrl={entry.data.canonical}
+>
   <article>
     <h1>{title}</h1>
     <p class="entry-meta">

@@ -21,27 +21,50 @@ async function readDistFile(relativePath) {
   }
 }
 
-async function findEntryPages() {
+/**
+ * Finds every entry by walking for its markdown twin. Entries live at
+ * `<kind>/<year>/<month>/<day>/<slug>/` with a twin at `<...>/<slug>.md`, so the
+ * twin is the reliable marker and the page has to sit beside it.
+ */
+async function walkForMarkdownTwins(directory, relativePath = "") {
+  const found = [];
+  let directoryEntries;
+
+  try {
+    directoryEntries = await readdir(directory, { withFileTypes: true });
+  } catch {
+    return found;
+  }
+
+  for (const entry of directoryEntries) {
+    const entryPath = join(directory, entry.name);
+    const entryRelativePath = relativePath ? `${relativePath}/${entry.name}` : entry.name;
+
+    if (entry.isDirectory()) {
+      found.push(...(await walkForMarkdownTwins(entryPath, entryRelativePath)));
+      continue;
+    }
+
+    if (!entry.name.endsWith(".md")) continue;
+
+    const sitePath = entryRelativePath.slice(0, -3);
+    try {
+      await stat(join(distRoot, `${sitePath}/index.html`));
+      found.push({ sitePath, twinPath: entryRelativePath });
+    } catch {
+      failures.push(`markdown twin has no page beside it: ${entryRelativePath}`);
+    }
+  }
+
+  return found;
+}
+
+async function findEntries() {
   const kinds = ["posts", "notes", "links", "photos"];
   const found = [];
 
   for (const kind of kinds) {
-    let directoryEntries;
-    try {
-      directoryEntries = await readdir(join(distRoot, kind), { withFileTypes: true });
-    } catch {
-      continue;
-    }
-
-    for (const entry of directoryEntries) {
-      if (!entry.isDirectory()) continue;
-      try {
-        await stat(join(distRoot, kind, entry.name, "index.html"));
-        found.push({ kind, slug: entry.name });
-      } catch {
-        failures.push(`entry page has no index.html: ${kind}/${entry.name}`);
-      }
-    }
+    found.push(...(await walkForMarkdownTwins(join(distRoot, kind), kind)));
   }
 
   return found;
@@ -50,14 +73,14 @@ async function findEntryPages() {
 const indexHtml = await readDistFile("index.html");
 check(Boolean(indexHtml?.includes('id="main"')), "index.html has no main landmark");
 
-const entryPages = await findEntryPages();
+const entries = await findEntries();
 // An empty content directory is a valid state: the site ships unpublished.
 // Everything below still checks the build output is internally consistent.
 
 const rssXml = await readDistFile("rss.xml");
 check(Boolean(rssXml?.includes("<rss")), "rss.xml does not look like RSS");
 check(
-  (rssXml?.match(/<item>/g) ?? []).length === entryPages.length,
+  (rssXml?.match(/<item>/g) ?? []).length === entries.length,
   "rss.xml item count differs from entry pages",
 );
 
@@ -70,7 +93,7 @@ if (feedJson) {
       "feed.json version is wrong",
     );
     check(
-      feed.items.length === entryPages.length,
+      feed.items.length === entries.length,
       "feed.json item count differs from entry pages",
     );
   } catch {
@@ -82,10 +105,7 @@ const archiveJson = await readDistFile("posts.json");
 if (archiveJson) {
   try {
     const archive = JSON.parse(archiveJson);
-    check(
-      archive.count === entryPages.length,
-      "posts.json count differs from entry pages",
-    );
+    check(archive.count === entries.length, "posts.json count differs from entry pages");
     check(
       archive.entries.every((entry) => typeof entry.word_count === "number"),
       "posts.json entry is missing a word count",
@@ -97,29 +117,19 @@ if (archiveJson) {
 
 const allMarkdown = await readDistFile("all.md");
 check(
-  (allMarkdown?.match(/^<!-- entry: /gm) ?? []).length === entryPages.length,
+  (allMarkdown?.match(/^<!-- entry: /gm) ?? []).length === entries.length,
   "all.md section count differs from entry pages",
 );
 
 const llmsTxt = await readDistFile("llms.txt");
 check(Boolean(llmsTxt?.startsWith("# ")), "llms.txt has no heading");
 
-for (const { kind, slug } of entryPages) {
-  check(
-    Boolean(llmsTxt?.includes(`/${kind}/${slug}/`)),
-    `llms.txt is missing ${kind}/${slug}`,
-  );
-  check(
-    Boolean(allMarkdown?.includes(`/${kind}/${slug}/`)),
-    `all.md is missing ${kind}/${slug}`,
-  );
+for (const { sitePath, twinPath } of entries) {
+  check(Boolean(llmsTxt?.includes(`/${sitePath}/`)), `llms.txt is missing ${sitePath}`);
+  check(Boolean(allMarkdown?.includes(`/${sitePath}/`)), `all.md is missing ${sitePath}`);
 
-  try {
-    const twin = await readFile(join(distRoot, kind, `${slug}.md`), "utf8");
-    check(twin.startsWith("---"), `${kind}/${slug}.md has no front matter block`);
-  } catch {
-    failures.push(`missing markdown twin: dist/${kind}/${slug}.md`);
-  }
+  const twin = await readFile(join(distRoot, twinPath), "utf8");
+  check(twin.startsWith("---"), `${twinPath} has no front matter block`);
 }
 
 const sitemap = await readDistFile("sitemap-index.xml");
@@ -138,5 +148,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `smoke check passed: ${entryPages.length} entries, feeds and machine files present`,
+  `smoke check passed: ${entries.length} entries, feeds and machine files present`,
 );

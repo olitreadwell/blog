@@ -26,3 +26,17 @@ export function formatEntryDate(date: Date): string {
 export function formatEntryDateMachine(date: Date): string {
   return machineDateFormatter.format(date);
 }
+
+/**
+ * Splits an entry date into URL segments. Dates sit in the path so the archive
+ * reads chronologically and an old post keeps the address it was published at.
+ */
+export function splitEntryDateParts(date: Date): {
+  year: string;
+  month: string;
+  day: string;
+} {
+  const [year = "0000", month = "00", day = "00"] =
+    formatEntryDateMachine(date).split("-");
+  return { year, month, day };
+}

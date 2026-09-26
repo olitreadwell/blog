@@ -1,7 +1,8 @@
-import type { MachineEntry } from "../../lib/machineOutput";
-import { toMachineEntries } from "../../lib/machineEntries";
-import { renderMarkdownTwin } from "../../lib/machineOutput";
-import { loadPublishedStream } from "../../lib/postStream";
+import { toMachineEntries } from "../../../../../lib/machineEntries";
+import { splitEntryDateParts } from "../../../../../lib/formatEntryDate";
+import type { MachineEntry } from "../../../../../lib/machineOutput";
+import { renderMarkdownTwin } from "../../../../../lib/machineOutput";
+import { loadPublishedStream } from "../../../../../lib/postStream";
 
 // Every entry gets a markdown copy at its own URL with `.md` appended, so an
 // agent can fetch one entry without parsing HTML.
@@ -9,7 +10,11 @@ export async function getStaticPaths() {
   const entries = toMachineEntries(await loadPublishedStream());
 
   return entries.map((entry) => ({
-    params: { kind: entry.kind, slug: entry.slug },
+    params: {
+      kind: entry.kind,
+      slug: entry.slug,
+      ...splitEntryDateParts(entry.date),
+    },
     props: { entry },
   }));
 }

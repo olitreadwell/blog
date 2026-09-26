@@ -25,19 +25,21 @@ npm run check:full # the above plus Playwright end-to-end and axe tests
 ## What an entry is
 
 Four collections share one set of front matter fields. The filename carries the
-date for sorting, and the URL drops it.
+date for sorting, and the URL carries it as path segments so the archive reads
+chronologically.
 
 ```
-content/posts/2026-09-24-a-blog-i-own.md    -> /posts/a-blog-i-own/
-content/notes/2026-09-24-small-notes.md     -> /notes/small-notes/
-content/links/2026-09-24-astro-docs.md      -> /links/astro-docs/
-content/photos/2026-09-24-waterfront.md     -> /photos/waterfront/
+content/posts/2018-06-08-conde-nast-paywall-e2e.md -> /posts/2018/06/08/conde-nast-paywall-e2e/
+content/notes/2026-09-26-small-notes.md            -> /notes/2026/09/26/small-notes/
+content/links/2026-09-26-astro-docs.md             -> /links/2026/09/26/astro-docs/
+content/photos/2026-09-26-waterfront.md            -> /photos/2026/09/26/waterfront/
 ```
 
 Shared fields: `date`, optional `title`, optional `summary`, `tags`, `draft`,
-optional `canonical`. Links add `url` and optional `site`. Photos add
-`images[]`, and every image needs `alt`, because the build rejects it
-otherwise.
+optional `canonical` (used when a post was first published somewhere else, and
+it changes the canonical link on the page). Links add `url` and optional
+`site`. Photos add `images[]`, and every image needs `alt`, because the build
+rejects it otherwise.
 
 Set `draft: true` to keep an entry out of production builds while it renders in
 development.
