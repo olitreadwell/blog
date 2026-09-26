@@ -97,7 +97,7 @@ if (archiveJson) {
 
 const allMarkdown = await readDistFile("all.md");
 check(
-  (allMarkdown?.match(/^## /gm) ?? []).length === entryPages.length,
+  (allMarkdown?.match(/^<!-- entry: /gm) ?? []).length === entryPages.length,
   "all.md section count differs from entry pages",
 );
 
