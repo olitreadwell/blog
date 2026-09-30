@@ -563,6 +563,11 @@ Question 1 decides whether the rest of this document applies at all.
   ever gets real traffic, since its free tier has no bandwidth cap.
 - Content storage: markdown in `content/`, drafts marked `draft: true` in the
   same directory rather than a separate `content/drafts/` folder.
+- URLs carry the date: `/<kind>/<YYYY>/<MM>/<DD>/<slug>/`, with the markdown
+  twin at the same path plus `.md`. This matches the Jekyll permalinks the old
+  posts were published under, so imported writing keeps the shape it had.
+- A `canonical` front matter field holds the original URL when a post first
+  appeared somewhere else, and the page emits it as the canonical link.
 - Tests: unit and integration in `tests/`, end-to-end and axe in `e2e/`, plus
   `scripts/smoke-dist.mjs` over the build output. No Lighthouse run yet.
 - Still open: licence, cross-post destinations, whether Bluesky posts by API,

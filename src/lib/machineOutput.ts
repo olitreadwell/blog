@@ -114,7 +114,9 @@ export function renderAllMarkdown(entries: MachineEntry[], site: FeedSiteInfo): 
       entry.tags.length > 0 ? `Tags: ${entry.tags.join(", ")}` : undefined,
     ].filter((line): line is string => Boolean(line));
 
-    return `\n---\n\n## ${entry.title}\n\n${meta.join("\n")}\n\n${entry.body.trim()}\n`;
+    // The marker keeps the section count checkable: entry bodies contain their
+    // own `##` headings, so counting those would overcount.
+    return `\n---\n\n<!-- entry: ${entry.kind}/${entry.slug} -->\n\n## ${entry.title}\n\n${meta.join("\n")}\n\n${entry.body.trim()}\n`;
   });
 
   return `${header}${sections.join("")}`;

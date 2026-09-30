@@ -1,5 +1,6 @@
 dist/
 .astro/
 node_modules/
+content/
 docs/SPEC.md
 tasks/

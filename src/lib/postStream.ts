@@ -1,5 +1,7 @@
 import { getCollection, type CollectionEntry } from "astro:content";
 
+import { splitEntryDateParts } from "./formatEntryDate";
+
 /** Collection names, in the order the site lists them. */
 export const postCollectionNames = ["posts", "notes", "links", "photos"] as const;
 
@@ -35,8 +37,26 @@ export async function loadPublishedStream(): Promise<PostEntry[]> {
   });
 }
 
-/** Builds the site path for an entry, for example `/posts/hello-blog/`. */
-export function buildEntryPath(entry: { collection: string; id: string }): string {
+/** The route params for one entry, with the date split into path segments. */
+export function buildEntryRouteParams(entry: {
+  collection: string;
+  id: string;
+  data: { date: Date };
+}): { kind: string; year: string; month: string; day: string; slug: string } {
+  const { year, month, day } = splitEntryDateParts(entry.data.date);
+  return { kind: entry.collection, year, month, day, slug: entry.id };
+}
+
+/**
+ * Builds the site path for an entry, for example
+ * `/posts/2018/06/08/conde-nast-paywall-e2e/`.
+ */
+export function buildEntryPath(entry: {
+  collection: string;
+  id: string;
+  data: { date: Date };
+}): string {
   const base = import.meta.env.BASE_URL.replace(/\/+$/, "");
-  return `${base}/${entry.collection}/${entry.id}/`;
+  const params = buildEntryRouteParams(entry);
+  return `${base}/${params.kind}/${params.year}/${params.month}/${params.day}/${params.slug}/`;
 }

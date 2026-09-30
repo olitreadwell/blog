@@ -98,8 +98,17 @@ describe("renderAllMarkdown", () => {
     const all = renderAllMarkdown(entries, site);
 
     expect(all.match(/^## /gm)).toHaveLength(2);
+    expect(all.match(/^<!-- entry: /gm)).toHaveLength(2);
     expect(all).toContain(postEntry.url);
     expect(all).toContain(noteEntry.title);
+  });
+
+  it("keeps section markers distinct from headings in a body", () => {
+    const bodyWithHeadings = { ...postEntry, body: "## A heading in the body" };
+    const all = renderAllMarkdown([bodyWithHeadings], site);
+
+    expect(all.match(/^<!-- entry: /gm)).toHaveLength(1);
+    expect(all.match(/^## /gm)).toHaveLength(2);
   });
 });
 
