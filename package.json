@@ -11,6 +11,7 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
+    "build:mcp": "node scripts/build-mcp.mjs",
     "preview": "astro preview",
     "astro": "astro",
     "typecheck": "astro check",
@@ -20,16 +21,19 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "smoke": "node scripts/smoke-dist.mjs",
+    "smoke:mcp": "node scripts/smoke-mcp.mjs",
     "e2e": "playwright test",
     "serve": "node scripts/serve-dist.mjs",
     "a11y": "playwright test e2e/accessibility.spec.ts",
-    "check": "npm run format:check && npm run lint && npm run typecheck && npm run build && npm run test && npm run smoke",
+    "check": "npm run format:check && npm run lint && npm run typecheck && npm run build && npm run build:mcp && npm run test && npm run smoke && npm run smoke:mcp",
     "check:full": "npm run check && npm run e2e"
   },
   "dependencies": {
     "@astrojs/rss": "4.0.19",
     "@astrojs/sitemap": "3.7.4",
-    "astro": "7.3.5"
+    "@modelcontextprotocol/sdk": "1.31.0",
+    "astro": "7.3.5",
+    "yaml": "2.9.1"
   },
   "devDependencies": {
     "@astrojs/check": "0.9.10",
@@ -37,6 +41,7 @@
     "@eslint/js": "10.0.1",
     "@playwright/test": "1.63.0",
     "@types/node": "26.6.3",
+    "esbuild": "0.28.2",
     "eslint": "10.11.0",
     "prettier": "3.9.9",
     "prettier-plugin-astro": "1.1.0",

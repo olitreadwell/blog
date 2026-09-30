@@ -1,6 +1,8 @@
 dist/
+mcp/dist/
 .astro/
 node_modules/
 content/
 docs/SPEC.md
+handoffs/
 tasks/
