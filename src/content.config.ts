@@ -2,7 +2,7 @@ import { defineCollection } from "astro:content";
 import { glob } from "astro/loaders";
 import { z } from "astro/zod";
 
-import { linkEntryFields, photoEntryFields, postBaseFields } from "./lib/postFrontMatter";
+import { postBaseFields, postKindFields } from "./lib/postFrontMatter";
 import { slugifyPostEntryId } from "./lib/postSlug";
 
 // Every collection uses the same loader shape: markdown in `content/<kind>/`,
@@ -22,8 +22,8 @@ function defineMarkdownCollection<
 }
 
 export const collections = {
-  posts: defineMarkdownCollection("posts", { title: z.string().min(1) }),
-  notes: defineMarkdownCollection("notes", {}),
-  links: defineMarkdownCollection("links", linkEntryFields),
-  photos: defineMarkdownCollection("photos", photoEntryFields),
+  posts: defineMarkdownCollection("posts", postKindFields.posts),
+  notes: defineMarkdownCollection("notes", postKindFields.notes),
+  links: defineMarkdownCollection("links", postKindFields.links),
+  photos: defineMarkdownCollection("photos", postKindFields.photos),
 };
