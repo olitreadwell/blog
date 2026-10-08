@@ -57,3 +57,7 @@ Anything that ships, in content or in a commit message, passes the prose gate:
 no em dashes, no rule-of-three padding, no banned words from the oli-style
 list, no platitude openers, no closing summaries. Plain language, specific
 facts.
+
+Post structure is a separate pass: the `software-blogging` skill covers the
+opening, what the reader is assumed to know, links that carry the post, and
+the mobile overflow and contrast checks on the built page.
