@@ -4,3 +4,6 @@ node_modules/
 content/
 docs/SPEC.md
 tasks/
+
+# Rewritten by Dependabot, so formatting here gets reverted on the next run.
+.github/dependabot.yml
