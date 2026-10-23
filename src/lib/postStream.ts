@@ -1,11 +1,11 @@
 import { getCollection, type CollectionEntry } from "astro:content";
 
+import { buildEntrySitePath } from "./entrySitePath";
 import { splitEntryDateParts } from "./formatEntryDate";
+import { postCollectionNames, type PostCollectionName } from "./postCollection";
 
-/** Collection names, in the order the site lists them. */
-export const postCollectionNames = ["posts", "notes", "links", "photos"] as const;
-
-export type PostCollectionName = (typeof postCollectionNames)[number];
+export { postCollectionNames };
+export type { PostCollectionName };
 
 /** Every entry kind the blog publishes. */
 export type PostEntry =
@@ -56,7 +56,8 @@ export function buildEntryPath(entry: {
   id: string;
   data: { date: Date };
 }): string {
-  const base = import.meta.env.BASE_URL.replace(/\/+$/, "");
-  const params = buildEntryRouteParams(entry);
-  return `${base}/${params.kind}/${params.year}/${params.month}/${params.day}/${params.slug}/`;
+  return buildEntrySitePath(
+    { directory: entry.collection, id: entry.id, date: entry.data.date },
+    import.meta.env.BASE_URL,
+  );
 }

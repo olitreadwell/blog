@@ -11,6 +11,8 @@ npm run check:full Adds Playwright end-to-end and axe accessibility tests.
 npm run test       Unit tests only, when iterating.
 npm run a11y       Accessibility scans only.
 npm run dev        Local server at http://localhost:4321/blog/
+npm run build:mcp  Bundle mcp/server.ts into mcp/dist/server.js.
+npm run smoke:mcp  Drive the built MCP server over stdio. Part of `check`.
 ```
 
 The live site is https://olitreadwell.github.io/blog/, deployed from `main` by
@@ -25,6 +27,9 @@ The live site is https://olitreadwell.github.io/blog/, deployed from `main` by
   welcome, publishing is a human decision.
 - `src/lib/` holds logic worth testing: schemas, slug rules, date formatting,
   the merged entry stream. Keep pure functions here.
+- `mcp/` holds the MCP server. It reads `content/<kind>/*.md` through
+  `src/lib/postFileStore.ts`, not through `postStream.ts`, because it runs
+  without Astro and cannot import `astro:content`. Build it before running it.
 - `src/pages/` holds routes. `[kind]/[slug].astro` serves every entry, so the
   URL shape is consistent across kinds.
 - `tests/` mirrors `src/lib/`. A test file is named after its source file.
@@ -35,6 +40,8 @@ The live site is https://olitreadwell.github.io/blog/, deployed from `main` by
 
 - Front matter is validated by the zod schema in `src/lib/postFrontMatter.ts`.
   Add a field there first, then use it in content. Never hand-validate.
+- `postKindFields` in that file is the one place the four kinds' fields are
+  declared. `src/content.config.ts` and the MCP reader both build from it.
 - Every image needs `alt`. That is a build failure on purpose.
 - Ids come from the filename through `slugifyPostEntryId`, which strips the
   `YYYY-MM-DD-` prefix. Keep the date in the filename, out of the URL.

@@ -4,8 +4,9 @@ Notes, links, photos and longer writing, published at
 [olitreadwell.github.io/blog](https://olitreadwell.github.io/blog/).
 
 Astro builds a static site from markdown in `content/`. There is no database
-and no server. An MCP server (later milestone) reads and writes the same
-markdown, so an agent session can draft, edit and publish without a CMS.
+and no server. An MCP server reads and writes the same markdown, so an agent
+session can list, read and search entries without a CMS. The read tools are
+built; the write tools are the next milestone.
 
 The content directory starts empty on purpose. Entries here are written by me.
 Agent help with drafting is fine, the words are still mine.
@@ -20,7 +21,37 @@ npm ci
 npm run dev        # http://localhost:4321/blog/
 npm run check      # format, lint, types, unit tests, build, smoke check
 npm run check:full # the above plus Playwright end-to-end and axe tests
+npm run build:mcp  # bundle the MCP server into mcp/dist/server.js
+npm run smoke:mcp  # drive that server over stdio and check the read tools
 ```
+
+## MCP server
+
+`mcp/server.ts` exposes the archive over MCP. It reads `content/<kind>/*.md`
+directly and validates front matter with the same schema the Astro build uses,
+so a bad entry fails both the same way. The build bundles it into
+`mcp/dist/server.js`, which is gitignored.
+
+Three read tools, all returning JSON text:
+
+- `blog_list_posts` takes `kind`, `tag`, `limit` and `include_drafts`.
+- `blog_get_post` takes `slug` and returns the entry with its markdown body.
+- `blog_search_posts` takes `query`, `limit` and `include_drafts`, and matches
+  titles, summaries, tags and bodies.
+
+Drafts are hidden unless `include_drafts` is true, matching a production build.
+`BLOG_REPO_ROOT` overrides where the server looks for `content/`, and
+`BLOG_SITE_BASE` overrides the `/blog` base path in the URLs it returns.
+
+Wire it into Codex in `~/.codex/config.toml`:
+
+```toml
+[mcp_servers.blog]
+command = "node"
+args = ["/Users/oli/code/blog/mcp/dist/server.js"]
+```
+
+Run `npm run build:mcp` after changing anything under `mcp/` or `src/lib/`.
 
 ## What an entry is
 
@@ -59,6 +90,8 @@ npm run a11y          The axe scans, which are the accessibility subset of e2e
 npm run serve         Serve dist/ in the foreground on port 4321
 npm run check         Format, lint, types, unit tests, build, smoke
 npm run check:full    Everything CI runs, including Playwright and axe
+npm run build:mcp     Bundle mcp/server.ts into mcp/dist/server.js
+npm run smoke:mcp     Drive the built MCP server over stdio
 ```
 
 ## Deploying
@@ -83,13 +116,14 @@ bucket or a VPS running Caddy.
 
 ```
 content/       markdown entries, one directory per kind
+mcp/           the MCP server, bundled to mcp/dist/server.js
 src/lib/       front matter schemas, slugs, date formatting, the entry stream
 src/pages/     index, per-kind archives, one route for every entry
 src/layouts/   the page shell
 src/styles/    global CSS, light and dark
 tests/         unit tests for the lib layer
 e2e/           Playwright end-to-end and axe accessibility tests
-scripts/       smoke check over dist/ and the foreground static server
+scripts/       smoke checks, the MCP bundle step, the foreground static server
 docs/          SPEC.md, the full specification
 tasks/         plan.md and todo.md, the build order
 ```
