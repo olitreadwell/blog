@@ -1,5 +1,12 @@
 # Agent notes for this repo
 
+<!-- coding-standards:begin -->
+Project coding rules: `CODING_STANDARDS.md`. Global baseline:
+`~/.agents/standards/CODING_STANDARDS.md`. Read both before changing
+behaviour.
+<!-- coding-standards:end -->
+
+
 Read `docs/SPEC.md` before changing content shapes, routes or the pipeline. It
 is the specification, this file is the working convention.
 
